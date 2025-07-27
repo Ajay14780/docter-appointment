@@ -1,12 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../context/AppContext'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setToken } from '../slices/tokenSlice'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
-const Login = () => {
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-  const { backendUrl, token, setToken } = useContext(AppContext)
+const Login = () => {
+  const token = useSelector((state) => state.token.token)
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [state, setState] = useState('Sign Up')
   const [name, setName] = useState('')
@@ -15,14 +18,12 @@ const Login = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault()
-
     try {
-
-      if (state === 'Sign up') {
+      if (state === 'Sign Up') {
         const { data } = await axios.post(backendUrl + '/api/user/register', { name, password, email })
         if (data.success) {
           localStorage.setItem('token', data.token)
-          setToken(data.token)
+          dispatch(setToken(data.token))
         } else {
           toast.error(data.message)
         }
@@ -30,12 +31,11 @@ const Login = () => {
         const { data } = await axios.post(backendUrl + '/api/user/login', { email, password })
         if (data.success) {
           localStorage.setItem('token', data.token)
-          setToken(data.token)
+          dispatch(setToken(data.token))
         } else {
           toast.error(data.message)
         }
       }
-
     } catch (error) {
       toast.error(error.message)
     }

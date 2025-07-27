@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
+import { useSelector } from 'react-redux'
 
 const Doctors = () => {
 
@@ -8,7 +8,7 @@ const Doctors = () => {
   const [filterDoc, setFilterDoc] = useState([])
   const [showFilter, setShowFilter] = useState(false)
   const navigate = useNavigate()
-  const { doctors } = useContext(AppContext)
+  const doctors = useSelector((state) => state.doctors.doctors)
 
   const applyFilter = () => {
     if (speciality) {

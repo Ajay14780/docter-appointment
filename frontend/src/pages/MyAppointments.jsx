@@ -1,11 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../context/AppContext'
+import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchDoctors } from '../slices/doctorsSlice'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 
-const MyAppointments = () => {
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-  const { backendUrl, token, getDoctorsData } = useContext(AppContext)
+const MyAppointments = () => {
+  const token = useSelector((state) => state.token.token)
+  const dispatch = useDispatch()
   const [appointments, setAppointments] = useState([])
   const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -41,7 +44,7 @@ const MyAppointments = () => {
       if (data.success) {
         toast.success(data.message)
         getUserAppointments()
-        getDoctorsData()
+        dispatch(fetchDoctors(backendUrl))
       } else {
         toast.error(data.message)
       }

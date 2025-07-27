@@ -1,15 +1,20 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchDoctors } from '../slices/doctorsSlice'
 import { assets } from '../assets/assets_frontend/assets'
 import RelatedDoctor from '../components/RelatedDoctor'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 
-const Appointment = () => {
+const currencySymbol = '$'
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 
+const Appointment = () => {
   const { docId } = useParams()
-  const { doctors, currencySymbol, backendUrl, token, getDoctorsData } = useContext(AppContext)
+  const doctors = useSelector((state) => state.doctors.doctors)
+  const token = useSelector((state) => state.token.token)
+  const dispatch = useDispatch()
 
   const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
@@ -97,7 +102,7 @@ const Appointment = () => {
 
       if (data.success) {
         toast.success(data.message)
-        getDoctorsData()
+        dispatch(fetchDoctors(backendUrl))
         navigate('/my-appointments')
       } else {
         toast.error(data.message)
@@ -110,7 +115,7 @@ const Appointment = () => {
   }
 
   useEffect(() => {
-    fetchDocInfo(docInfo)
+    fetchDocInfo()
   }, [doctors, docId])
 
   useEffect(() => {

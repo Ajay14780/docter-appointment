@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../context/AppContext'
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 const RelatedDoctor = ({ speciality, docId }) => {
-
-  const { doctors } = useContext(AppContext)
+  const doctors = useSelector((state) => state.doctors.doctors)
   const navigate = useNavigate()
   const [relDoc, setRelDoc] = useState([])
 

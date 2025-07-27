@@ -1,46 +1,41 @@
-import React, { useContext, useState } from 'react'
-import { AppContext } from '../context/AppContext'
+import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserProfile } from '../slices/userSlice'
 import { assets } from '../assets/assets_frontend/assets'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL
+
 const MyProfile = () => {
-
-  const { userData, setUserData, token, backendUrl, loadUserProfileData } = useContext(AppContext)
-
+  const userData = useSelector((state) => state.user.userData)
+  const token = useSelector((state) => state.token.token)
+  const dispatch = useDispatch()
   const [isEdit, setIsEdit] = useState(false)
   const [image, setImage] = useState(false)
 
   const updateUserProfileData = async () => {
-
     try {
-
       const formData = new FormData()
-
       formData.append('name', userData.name)
       formData.append('phone', userData.phone)
       formData.append('address', JSON.stringify(userData.address))
       formData.append('gender', userData.gender)
       formData.append('dob', userData.dob)
-
       image && formData.append('image', image)
-
       const { data } = await axios.post(backendUrl + '/api/user/update-profile', formData, { headers: { token } })
-
       if (data.success) {
         toast.success(data.message)
-        await loadUserProfileData()
+        await dispatch(fetchUserProfile({ backendUrl, token }))
         setIsEdit(false)
         setImage(false)
       } else {
         toast.error(data.message)
       }
-
     } catch (error) {
       console.log(error)
       toast.error(error.message)
     }
-
   }
 
   return userData && (
@@ -60,7 +55,7 @@ const MyProfile = () => {
 
       {
         isEdit
-          ? <input className='bg-gray-50 text-3xl font-medium max-w-60 mt-4' type="text" value={userData.name} onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))} />
+          ? <input className='bg-gray-50 text-3xl font-medium max-w-60 mt-4' type="text" value={userData.name} onChange={e => dispatch(fetchUserProfile({ backendUrl, token, userData: { ...userData, name: e.target.value } }))} />
           : <p className='font-medium text-3xl text-neutral-800 mt-4'>{userData.name}</p>
       }
 
@@ -76,7 +71,7 @@ const MyProfile = () => {
           <p className='font-medium'>Phone:</p>
           {
             isEdit
-              ? <input className='bg-gray-100 max-w-52' type="text" value={userData.phone} onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))} />
+              ? <input className='bg-gray-100 max-w-52' type="text" value={userData.phone} onChange={e => dispatch(fetchUserProfile({ backendUrl, token, userData: { ...userData, phone: e.target.value } }))} />
               : <p className='text-blue-500'>{userData.phone}</p>
           }
 
@@ -86,9 +81,9 @@ const MyProfile = () => {
               isEdit
                 ?
                 <p>
-                  <input className='bg-gray-100' onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))} value={userData.address.line1} type="text" />
+                  <input className='bg-gray-100' onChange={(e) => dispatch(fetchUserProfile({ backendUrl, token, userData: { ...userData, address: { ...userData.address, line1: e.target.value } } }))} value={userData.address.line1} type="text" />
                   <br />
-                  <input className='bg-gray-100' onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))} value={userData.address.line2} type="text" />
+                  <input className='bg-gray-100' onChange={(e) => dispatch(fetchUserProfile({ backendUrl, token, userData: { ...userData, address: { ...userData.address, line2: e.target.value } } }))} value={userData.address.line2} type="text" />
                 </p>
                 :
                 <p className='text-gray-400'>
@@ -109,7 +104,7 @@ const MyProfile = () => {
           {
             isEdit
               ?
-              <select className='max-w-20 bg-gray-100' onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))} value={userData.gender}>
+              <select className='max-w-20 bg-gray-100' onChange={(e) => dispatch(fetchUserProfile({ backendUrl, token, userData: { ...userData, gender: e.target.value } }))} value={userData.gender}>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
@@ -120,7 +115,7 @@ const MyProfile = () => {
           <p className='font-medium'>Birthday:</p>
           {
             isEdit
-              ? <input className='max-w-28 bg-gray-100' type='date' onChange={(e) => setUserData(prev => ({ ...prev, dob: e.target.value }))} value={userData.dob} />
+              ? <input className='max-w-28 bg-gray-100' type='date' onChange={(e) => dispatch(fetchUserProfile({ backendUrl, token, userData: { ...userData, dob: e.target.value } }))} value={userData.dob} />
               : <p className='text-gray-400'>{userData.dob}</p>
           }
         </div>

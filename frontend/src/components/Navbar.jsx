@@ -1,17 +1,18 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets_frontend/assets'
-import { AppContext } from '../context/AppContext';
+import { useSelector, useDispatch } from 'react-redux'
+import { clearToken } from '../slices/tokenSlice'
 
 const Navbar = () => {
-
   const navigate = useNavigate();
-  const { token, setToken, userData } = useContext(AppContext)
+  const token = useSelector((state) => state.token.token)
+  const userData = useSelector((state) => state.user.userData)
+  const dispatch = useDispatch()
   const [showMenu, setShowMenu] = useState(false);
 
   const logout = () => {
-    setToken(false)
-    localStorage.removeItem('token')
+    dispatch(clearToken())
   }
 
   return (
